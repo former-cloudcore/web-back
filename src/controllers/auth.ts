@@ -22,11 +22,13 @@ const register = async (req: Request, res: Response) => {
         }
         const salt = await bcrypt.genSalt(10);
         const encryptedPassword = await bcrypt.hash(password, salt);
-        const response = await User.create({ 'email': email, 'name': name, 'password': encryptedPassword, image: image });
-        const tokens = await createTokens(response);
-        const user = { ...response['_doc'], ...tokens };
-        delete user['refreshTokens'];
-        return res.status(201).send(user);
+        const user = new User({ 'email': email, 'name': name, 'password': encryptedPassword, image: image });
+        await user.save();
+        const tokens = await createTokens(user);
+        const userObj = user.toObject();
+        delete userObj['password'];
+        delete userObj['refreshTokens'];
+        return res.status(201).send({ ...userObj, ...tokens });
     } catch (err) {
         return res.status(400).send(err.message);
     }
