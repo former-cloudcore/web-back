@@ -2,6 +2,7 @@ import mongoose, { PopulatedDoc } from "mongoose";
 import { IUser } from "./user";
 
 export interface IPost {
+    comments_amount: number;
     text: string;
     date: Date;
     usersWhoLiked: string[];

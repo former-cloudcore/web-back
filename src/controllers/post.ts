@@ -26,13 +26,14 @@ class PostController extends BaseController<IPost>{
     }
 
     async get(req: AuthRequest, res: Response) {
-        const posts: IPost[] = await this.model.find();
+        const posts = await this.model.find();
         const modifiedPosts = posts.map(post => {
-            const comments_amount = post.comments.length;
-            delete post.comments
-            return { ...post, comments_amount }
+            const postObj = post.toObject();
+            const comments_amount = postObj.comments.length;
+            delete postObj.comments
+            postObj.comments_amount = comments_amount;
+            return postObj;
         });
-        
         res.send(modifiedPosts);
     }
 
