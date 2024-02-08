@@ -3,6 +3,7 @@ import User from '../models/user';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import { OAuth2Client } from 'google-auth-library';
+import env from "dotenv";
 
 const client = new OAuth2Client();
 
@@ -10,7 +11,7 @@ const register = async (req: Request, res: Response) => {
     const email = req.body.email;
     const password = req.body.password;
     const name = req.body.name;
-    const image = req.body.image;
+    const image = req.body.image ?? process.env.DEFAULT_PICTURE_PATH;
 
     if (!email || !password) {
         return res.status(400).send("missing email or password");
@@ -122,7 +123,7 @@ const googleSignIn = async (req: Request, res: Response) => {
         const email = payload?.email;
         if (email) {
             let user = await User.findOne({ 'email': email });
-            if (!user) { 
+            if (!user) {
                 // create user in db if it doesn't already exist
                 user = await User.create(
                     {
