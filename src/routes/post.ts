@@ -297,8 +297,11 @@ router.delete("/:id", authMiddleware, PostController.deleteById.bind(PostControl
 *       content:
 *         application/json:
 *           schema:
-*             postId: string
-*             $ref: '#/components/schemas/Comment'
+*             type: object
+*             required: true
+*             properties:  
+*               text: 
+*                 type: string
 *     responses:
 *       201:
 *         description: the updated post
