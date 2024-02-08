@@ -2,7 +2,6 @@ import mongoose, { PopulatedDoc } from "mongoose";
 import { IUser } from "./user";
 
 export interface IPost {
-    comments_amount: number;
     text: string;
     date: Date;
     usersWhoLiked: string[];
@@ -10,6 +9,7 @@ export interface IPost {
     _id?: string;
     comments?: { user: PopulatedDoc<IUser>, text: string }[];
     createdBy: PopulatedDoc<IUser>;
+    comments_amount?: number;
 }
 
 const postSchema = new mongoose.Schema<IPost>({
