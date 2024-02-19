@@ -25,6 +25,7 @@ const userSchema = new mongoose.Schema<IUser>({
     },
     image: {
         type: String,
+        default: process.env.DEFAULT_PICTURE_PATH
     },
     refreshTokens: {
         type: [String],

@@ -9,7 +9,21 @@ class UserController extends BaseController<IUser>{
     }
 
     async get(req: AuthRequest, res: Response) {
-        super.get(req, res);
+        try {
+            const users = await this.model.find();
+
+            // Set default image for users with no image
+            const usersWithDefaultImage = users.map(user => {
+                if (!user.image || user.image === "") {
+                    user.image = process.env.DEFAULT_PICTURE_PATH
+                }
+                return user;
+            });
+
+            res.send(usersWithDefaultImage);
+        } catch (err) {
+            res.status(500).json({ message: err.message });
+        }
     }
 
     async getById(req: AuthRequest, res: Response) {
