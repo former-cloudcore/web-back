@@ -8,7 +8,7 @@ export class BaseController<ModelType>{
         this.model = model;
     }
 
-    async get(req: Request, res: Response, objectToEmit?:string) {
+    async get(req: Request, res: Response, objectToEmit?: string) {
         try {
             const objs = await this.model.find().select(`-${objectToEmit}`);
             res.send(objs);
@@ -20,6 +20,16 @@ export class BaseController<ModelType>{
     async getById(req: Request, res: Response) {
         try {
             const obj = await this.model.findById(req.params.id);
+            if (!obj) res.status(404);
+            res.send(obj);
+        } catch (err) {
+            res.status(500).json({ message: err.message });
+        }
+    }
+
+    async getByIdPopulated(req: Request, res: Response, path: string, select?: string) {
+        try {
+            const obj = (await this.model.findById(req.params.id).populate(path, select));
             if (!obj) res.status(404);
             res.send(obj);
         } catch (err) {

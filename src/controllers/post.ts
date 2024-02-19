@@ -26,11 +26,11 @@ class PostController extends BaseController<IPost>{
     }
 
     async get(req: AuthRequest, res: Response) {
-        const posts = await this.model.find();
+        const posts = await this.model.find().populate('createdBy', 'name image');
         const modifiedPosts = posts.map(post => {
             const postObj = post.toObject();
             const comments_amount = postObj.comments.length;
-            delete postObj.comments
+            delete postObj.comments;
             postObj.comments_amount = comments_amount;
             return postObj;
         });
@@ -38,12 +38,12 @@ class PostController extends BaseController<IPost>{
     }
 
     async getById(req: AuthRequest, res: Response) {
-        super.getById(req, res);
+        super.getByIdPopulated(req, res, 'createdBy', 'name image');
     }
 
     async getByUserId(req: AuthRequest, res: Response) {
         try {
-            const posts = await this.model.find({ createdBy: req.params.user_id }).select("-comments");
+            const posts = await this.model.find({ createdBy: req.params.user_id }).select("-comments").populate('createdBy', 'name image');
             res.send(posts);
         } catch (err) {
             res.status(500).json({ message: err.message });
