@@ -1,8 +1,8 @@
-import { BaseController } from "./base_controller";
-import { Response } from "express";
-import { AuthRequest } from "../common/auth_middleware";
-import Post, { IPost } from "../models/post";
-import { generateImage } from "../services/image_generator";
+import {BaseController} from "./base_controller";
+import {Response} from "express";
+import {AuthRequest} from "../common/auth_middleware";
+import Post, {IPost} from "../models/post";
+import {generateImage} from "../services/image_generator";
 
 class PostController extends BaseController<IPost>{
     constructor() {
@@ -10,14 +10,14 @@ class PostController extends BaseController<IPost>{
     }
 
     async post(req: AuthRequest, res: Response) {
-        const _id = req.user._id;
-        req.body.createdBy = _id;
+        req.body.createdBy = req.user._id;
 
         if (req.body.image_prompt) {
             generateImage(req.body.image_prompt).then((image) => {
                 req.body.image = image;
                 super.post(req, res);
             }).catch((err) => {
+                console.error(err);
                 res.status(400).send("failed to generate image")
             });
         } else {
@@ -77,7 +77,7 @@ class PostController extends BaseController<IPost>{
     async like(req: AuthRequest, res: Response) {
         const postId = req.params.id;
         try {
-            let requestedPost: IPost = await this.model.findById(postId).select('usersWhoLiked');
+            const requestedPost: IPost = await this.model.findById(postId).select('usersWhoLiked');
             if (requestedPost.usersWhoLiked.find(id => id.toString() === req.user._id)) {
                 throw ("failed, can't like an already liked post");
             } else {
@@ -95,13 +95,11 @@ class PostController extends BaseController<IPost>{
     async unlike(req: AuthRequest, res: Response) {
         const postId = req.params.id;
         try {
-            let requestedPost: IPost = await this.model.findById(postId);
+            const requestedPost: IPost = await this.model.findById(postId);
             if (!requestedPost.usersWhoLiked.find(id => id.toString() === req.user._id)) {
                 throw ("failed, can't unlike an already unliked post");
             } else {
-                const _id = req.user._id;
-                requestedPost.usersWhoLiked = requestedPost.usersWhoLiked.filter
-                    (id => id === req.user._id)
+                requestedPost.usersWhoLiked = requestedPost.usersWhoLiked.filter(id => id === req.user._id)
                 const obj = await this.model.findByIdAndUpdate(postId, requestedPost, { new: true });
                 res.status(200).send(obj);
             }

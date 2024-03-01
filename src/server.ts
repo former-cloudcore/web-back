@@ -4,31 +4,35 @@ import http from 'http';
 import fs from 'fs';
 import swaggerUI from "swagger-ui-express"
 import swaggerJsDoc from "swagger-jsdoc"
+import initSocket from "./tests/socket.io";
 
 initApp().then((app) => {
-  const options = {
-    definition: {
-      openapi: "3.0.0",
-      info: {
-        title: "Web Advanced Application development 2023 REST API",
-        version: "1.0.1",
-        description: "REST server including authentication using JWT and refresh token",
-      },
-      servers: [{ url: "http://localhost:3000", },],
-    },
-    apis: ["./src/routes/*.ts"],
-  };
-  const specs = swaggerJsDoc(options);
-  app.use("/api-docs", swaggerUI.serve, swaggerUI.setup(specs));
+    const options = {
+        definition: {
+            openapi: "3.0.0",
+            info: {
+                title: "Web Advanced Application development 2023 REST API",
+                version: "1.0.1",
+                description: "REST server including authentication using JWT and refresh token",
+            },
+            servers: [{url: "http://localhost:3000",},],
+        },
+        apis: ["./src/routes/*.ts"],
+    };
+    const specs = swaggerJsDoc(options);
+    app.use("/api-docs", swaggerUI.serve, swaggerUI.setup(specs));
 
-  if (process.env.NODE_ENV !== 'production') {
-    console.log('development');
-    http.createServer(app).listen(process.env.PORT);
-  } else{
-  const options2 = {
-    key: fs.readFileSync('../client-key.pem'),
-    cert: fs.readFileSync('../client-cert.pem')
-  };
-  https.createServer(options2, app).listen(process.env.HTTPS_PORT);
-  }
+    let server;
+
+    if (process.env.NODE_ENV !== 'production') {
+        console.log('development');
+        server = http.createServer(app).listen(process.env.PORT);
+    } else {
+        const options2 = {
+            key: fs.readFileSync('../client-key.pem'),
+            cert: fs.readFileSync('../client-cert.pem')
+        };
+        server = https.createServer(options2, app).listen(process.env.HTTPS_PORT);
+    }
+    initSocket(server);
 });
