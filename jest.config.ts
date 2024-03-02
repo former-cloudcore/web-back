@@ -2,5 +2,8 @@
 export default {
     preset: "ts-jest",
     testEnvironment: "node",
-    roots: ["<rootDir>/src"]
+    roots: ["<rootDir>/src"],
+    globals: {
+        'process.env.NODE_ENV': 'test',
+      },
 };

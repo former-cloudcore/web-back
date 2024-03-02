@@ -1,5 +1,9 @@
 import env from "dotenv";
-env.config();
+if (process.env.NODE_ENV === 'test') {
+  env.config({ path: '.env.test' });
+} else {
+  env.config();
+}
 import express, { Express } from "express";
 import mongoose from "mongoose";
 import bodyParser from "body-parser";
@@ -16,7 +20,8 @@ const initApp = (): Promise<Express> => {
     db.once("open", () => console.log("Connected to Database"));
     db.on("error", (error) => console.error(error));
     const url = process.env.DB_URL;
-    mongoose.connect(url!, { dbName: "web-server-db" }).then(() => {
+    const schema = process.env.DB_SCHEMA;
+    mongoose.connect(url!, { dbName: schema }).then(() => {
       const app = express();
       app.use(bodyParser.json());
       app.use(bodyParser.urlencoded({ extended: true }));
