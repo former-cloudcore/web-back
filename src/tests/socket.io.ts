@@ -16,6 +16,11 @@ const initSocket = (server) => {
             console.log(`A client joined the room: ${chatId}`);
         });
 
+        socket.on('leaveRoom', (chatId) => {
+            socket.leave(chatId);
+            console.log(`A client left the room: ${chatId}`);
+        });
+
         socket.on('sendMessage', async ({ message, chatId, token }) => {
             const newMessage = await handleMessagePosting(message, chatId, token);
             io.to(chatId).emit('message', newMessage);

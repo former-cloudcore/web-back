@@ -22,15 +22,17 @@ class ChatController extends BaseController<IChat> {
     async postMessage(req: AuthRequest, res: Response) {
         try {
             const {text, chatId} = req.body;
+            const decodedText: string = decodeURIComponent(text);
             const requestedChat: IChat = await this.model.findById(chatId).select('messages');
             if (!requestedChat) {
                 throw 'Chat not found';
             }
 
-            const message = new Message({text, user: req.user._id});
+            const message = new Message({text: decodedText, user: req.user._id});
             requestedChat.messages.push(message);
             const updatedChat = await this.model.findByIdAndUpdate(chatId, requestedChat, {new: true});
-            res.status(200).json(updatedChat.messages);        } catch (err) {
+            res.status(200).json(updatedChat.messages);
+        } catch (err) {
             res.status(500).json({error: err.message});
         }
     }

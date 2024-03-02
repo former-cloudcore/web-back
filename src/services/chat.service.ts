@@ -3,7 +3,7 @@ import http from "http";
 //TODO: Check socket with both http and https
 
 export async function handleMessagePosting(text: string, chatId: string, token: string) {
-    const data = JSON.stringify({text, chatId});
+    const data = JSON.stringify({text: encodeURIComponent(text), chatId});
 
     return new Promise((resolve, reject) => {
         const req = http.request({
@@ -25,8 +25,15 @@ export async function handleMessagePosting(text: string, chatId: string, token: 
 
             res.on('end', () => {
                 const body = Buffer.concat(chunks).toString();
-                resolve(body);
+                try {
+                    const json = JSON.parse(body);
+                    resolve(json);
+                } catch (error) {
+                    console.error('Failed to parse message:', error);
+                    reject(error);
+                }
             });
+
 
             res.on('error', (err) => {
                 reject(err);
