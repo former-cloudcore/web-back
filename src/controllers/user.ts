@@ -14,7 +14,7 @@ class UserController extends BaseController<IUser>{
 
             // Set default image for users with no image
             const usersWithDefaultImage = users.map(user => {
-                if (!user.image || user.image === "") {
+                if (!user.image || user.image === "" || user.image === "/path/to/image") {
                     user.image = process.env.DEFAULT_PICTURE_PATH
                 }
                 return user;
