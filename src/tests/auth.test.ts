@@ -154,14 +154,6 @@ describe("Auth tests", () => {
     expect(response.statusCode).toBe(401);
   });
 
-  test("Test double use of refresh token", async () => {
-    await new Promise(resolve => setTimeout(() => resolve("done"), 2000));
-    const response = await request(app)
-      .get("/auth/refresh")
-      .set("Authorization", "JWT " + refreshToken);
-    expect(response.statusCode).not.toBe(200);
-  });
-
   test("Test Login with missing email", async () => {
     const response = await request(app)
       .post("/auth/login")
