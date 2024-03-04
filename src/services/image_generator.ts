@@ -29,6 +29,7 @@ export async function generateImage(prompt: string) {
             if (response.data.status === "COMPLETED") {
                 const filePath = 'public/' + Date.now() + ".png";
                 await saveFile(response.data.result.output[0], filePath);
+                console.log(filePath)
                 return filePath;
             }
             await new Promise(resolve => setTimeout(resolve, 1000));

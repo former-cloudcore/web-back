@@ -5,6 +5,7 @@ import initApp from "../app";
 import mongoose from "mongoose";
 import User, { IUser } from "../models/user";
 import Post, { IPost } from "../models/post";
+import { generateImage } from "../services/image_generator";
 
 let app: Express;
 const user: IUser = {
@@ -22,8 +23,9 @@ const post: IPost = {
 
 let newPost = { text: "this is actually new", _id: "" }
 
-const post2: IPost = {
-    text: "this is a new post",
+const postWithPrompt = {
+    text: "image prompt post",
+    image_prompt: "image prompt",
     date: new Date(),
     createdBy: "",
     usersWhoLiked: []
@@ -64,7 +66,7 @@ describe("Post get tests", () => {
 });
 
 describe("Post post tests", () => {
-    test("Test Post a post", async () => {
+    test("should create a post without an image", async () => {
         const response = await request.post("/post").send(post);
         expect(response.statusCode).toBe(201);
         post._id = response.body._id;
@@ -83,6 +85,36 @@ describe("Post post tests", () => {
         expect(response.statusCode).toBe(200);
         expect(response.body).toHaveLength(1);
     });
+
+    // test("should create a post with an image", async () => {
+    //     const imagePrompt = "image prompt";
+    //     const response = await request.post("/post").send({ ...post, image_prompt: imagePrompt });
+    //     console.log(response)
+    //     expect(response.statusCode).toBe(201);
+    //     expect(response.body.text).toEqual(post.text);
+    //     expect(response.body.createdBy).toEqual(user._id);
+    //     expect(response.body.image).toBeDefined();
+    // }, 30000); // 10 seconds timeout
+
+    // test("should create a post with an image", async () => {
+    //     const imagePrompt = "image prompt";
+    //     const response = await request.post("/post").send({ ...post, image_prompt: imagePrompt });
+    //     expect(response.statusCode).toBe(201);
+    //     expect(response.body.text).toEqual(post.text);
+    //     expect(response.body.createdBy).toEqual(user._id);
+    //     expect(response.body.image).toBeDefined();
+    // });
+
+    // test("should handle error when failed to generate image", async () => {
+    //     const imagePrompt = "image prompt";
+    //     jest.spyOn(console, 'error').mockImplementation(() => { });
+    //     global.generateImage = jest.fn().mockRejectedValue(new Error('Failed to generate image'));
+    //     const response = await request.post("/post").send({ ...post, image_prompt: imagePrompt });
+    //     expect(response.statusCode).toBe(400);
+    //     expect(response.text).toBe("failed to generate image");
+
+    //     jest.restoreAllMocks();
+    // });
 });
 
 describe("Post get tests", () => {
@@ -191,4 +223,14 @@ describe("Delete post tests", () => {
         const response = await request.delete("/post/" + post._id);
         expect(response.statusCode).toBe(400);
     });
+});
+
+describe("post with image prompt", () => {
+    test("should create a post with an image", async () => {
+        const response = await request.post("/post").send(postWithPrompt);
+        expect(response.statusCode).toBe(201);
+        expect(response.body.text).toEqual(postWithPrompt.text);
+        expect(response.body.createdBy).toEqual(user._id);
+        expect(response.body.image).toBeDefined();
+    }, 30000);
 });

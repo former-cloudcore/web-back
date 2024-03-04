@@ -3,7 +3,6 @@ import User from '../models/user';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import { OAuth2Client } from 'google-auth-library';
-import env from "dotenv";
 
 const client = new OAuth2Client();
 
@@ -59,13 +58,14 @@ const login = async (req: Request, res: Response) => {
 }
 
 const logout = async (req: Request, res: Response) => {
-    const authHeader = req.headers['authorization'];
-    const refreshToken = authHeader && authHeader.split(' ')[1]; // Bearer <token>
-    if (!refreshToken) return res.sendStatus(401);
-    jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET, async (err, user: { '_id': string }) => {
-        if (err) return res.sendStatus(401);
-        try {
-            const userDb = await User.findOne({ '_id': user._id });
+    try {
+        const authHeader = req.headers['authorization'];
+        const refreshToken = authHeader && authHeader.split(' ')[1]; // Bearer <token>
+        if (!refreshToken) return res.sendStatus(401);
+        jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET, async (err, user: { '_id': string }) => {
+            if (err) return res.sendStatus(401);
+
+            const userDb = await User.findOne({ '_id': user._id }).select('+refreshTokens');
             if (!userDb.refreshTokens || !userDb.refreshTokens.includes(refreshToken)) {
                 userDb.refreshTokens = [];
                 await userDb.save();
@@ -75,23 +75,25 @@ const logout = async (req: Request, res: Response) => {
                 await userDb.save();
                 return res.sendStatus(200);
             }
-        } catch (err) {
-            res.sendStatus(401).send(err.message);
-        }
-    });
+        });
+    }
+    catch (err) {
+        res.set(401).send(err.message);
+    }
 }
 
+
 const refresh = async (req: Request, res: Response) => {
-    const authHeader = req.headers['authorization'];
-    const refreshToken = authHeader && authHeader.split(' ')[1].replace(/\"/g, ''); // Bearer <token>
-    if (!refreshToken) return res.status(401).send("No refresh token was provided");
-    jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET, async (err, user: { '_id': string }) => {
-        if (err) {
-            console.log(err);
-            return res.sendStatus(401);
-        }
-        try {
-            const userDb = await User.findOne({ '_id': user._id }).select('+refreshTokens');;
+    try {
+        const authHeader = req.headers['authorization'];
+        const refreshToken = authHeader && authHeader.split(' ')[1]?.replace(/\"/g, ''); // Bearer <token>
+        if (!refreshToken) return res.status(401).send("No refresh token was provided");
+        jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET, async (err, user: { '_id': string }) => {
+            if (err) {
+                console.log(err);
+                return res.sendStatus(401);
+            }
+            const userDb = await User.findOne({ '_id': user._id }).select('+refreshTokens');
             if (!userDb.refreshTokens || !userDb.refreshTokens.includes(refreshToken)) {
                 userDb.refreshTokens = [];
                 await userDb.save();
@@ -106,47 +108,10 @@ const refresh = async (req: Request, res: Response) => {
                 'accessToken': accessToken,
                 'refreshToken': refreshToken
             });
-        } catch (err) {
-            res.sendStatus(401).send(err.message);
-        }
-    });
-}
-
-const googleSignIn = async (req: Request, res: Response) => {
-    console.log(req.body);
-    try {
-        const ticket = await client.verifyIdToken({
-            idToken: req.body.credential,
-            audience: process.env.GOOGLE_CLIENT_ID,
         });
-        const payload = ticket.getPayload();
-        const email = payload?.email;
-        if (email) {
-            let user = await User.findOne({ 'email': email });
-            if (!user) {
-                // create user in db if it doesn't already exist
-                user = await User.create(
-                    {
-                        'email': email,
-                        'password': '',
-                        'image': payload?.picture
-                    });
-            }
-            const tokens = await createTokens(user)
-            res.status(200).send(
-                {
-                    email: user.email,
-                    _id: user._id,
-                    image: user.image,
-                    ...tokens
-                })
-        } else {
-            res.status(401).send("email or password incorrect");
-        }
     } catch (err) {
-        return res.status(400).send(err.message);
+        res.set(401).send(err.message);
     }
-
 }
 
 const createTokens = async (user) => {
@@ -178,5 +143,5 @@ export default {
     login,
     logout,
     refresh,
-    googleSignIn
+    createTokens
 }

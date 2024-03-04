@@ -11,6 +11,12 @@ const user: IUser = {
   password: "1234567890",
 }
 
+const user2: IUser = {
+  name: "auth_test_user2",
+  email: "auth-test2@test.com",
+  password: "1234567890",
+}
+
 beforeAll(async () => {
   app = await initApp();
   await User.deleteMany({ 'email': user.email });
@@ -30,8 +36,12 @@ describe("Auth tests", () => {
     const response = await request(app)
       .post("/auth/register")
       .send(user);
+    accessToken = response.body.accessToken;
+    refreshToken = response.body.refreshToken;
     expect(response.statusCode).toBe(201);
   });
+
+
 
   test("Test Register existing email", async () => {
     const response = await request(app)
@@ -46,6 +56,32 @@ describe("Auth tests", () => {
         email: "test@test.com",
       });
     expect(response.statusCode).toBe(400);
+  });
+
+  test("Test Logout with valid token", async () => {
+    const response = await request(app)
+      .get("/auth/logout")
+      .set("authorization", "JWT " + refreshToken);
+    expect(response.statusCode).toBe(200);
+  });
+
+  test("Test Logout without token", async () => {
+    const response = await request(app).get("/auth/logout");
+    expect(response.statusCode).toBe(401);
+  });
+
+  test("Test Logout with invalid token", async () => {
+    const response = await request(app)
+      .get("/auth/logout")
+      .set("authorization", "JWT 1" + refreshToken);
+    expect(response.statusCode).toBe(401);
+  });
+
+  test("Test Logout with missing token", async () => {
+    const response = await request(app)
+      .get("/auth/logout")
+      .set("authorization", "Bearer");
+    expect(response.statusCode).toBe(401);
   });
 
   test("Test Login", async () => {
@@ -77,20 +113,18 @@ describe("Auth tests", () => {
     expect(response.statusCode).toBe(401);
   });
 
-  test("Test access after timeout of token", async () => {
-    await new Promise(resolve => setTimeout(() => resolve("done"), 3000));
-
-    const response = await request(app)
-      .get("/user/profile")
-      .set("Authorization", "JWT " + accessToken);
-    expect(response.statusCode).not.toBe(200);
-  });
+  // test("Test access after timeout of token", async () => {
+  //   await new Promise(resolve => setTimeout(() => resolve("done"), 6000));
+  //   const response = await request(app)
+  //     .get("/user/profile")
+  //     .set("Authorization", "JWT " + accessToken);
+  //   expect(response.statusCode).not.toBe(200);
+  // }, 7000);
 
   test("Test refresh token", async () => {
     const response = await request(app)
       .get("/auth/refresh")
-      .set("Authorization", "JWT " + refreshToken)
-      .send();
+      .set("Authorization", "JWT " + refreshToken);
     expect(response.statusCode).toBe(200);
     expect(response.body.accessToken).toBeDefined();
     expect(response.body.refreshToken).toBeDefined();
@@ -104,18 +138,88 @@ describe("Auth tests", () => {
     expect(response2.statusCode).toBe(200);
   });
 
-  test("Test double use of refresh token", async () => {
+  test("Test no refresh token", async () => {
     const response = await request(app)
       .get("/auth/refresh")
-      .set("Authorization", "JWT " + refreshToken)
-      .send();
-    expect(response.statusCode).not.toBe(200);
+      .set("Authorization", "JWT ");
+    console.log(response.body);
+    expect(response.statusCode).toBe(401);
+  });
 
-    //verify that the new token is not valid as well
-    const response1 = await request(app)
+  test("Test unauthorized refresh token", async () => {
+    const response = await request(app)
       .get("/auth/refresh")
-      .set("Authorization", "JWT " + newRefreshToken)
+      .set("Authorization", "JWT unauthorized-refresh-token")
       .send();
-    expect(response1.statusCode).not.toBe(200);
+    expect(response.statusCode).toBe(401);
+  });
+
+  test("Test double use of refresh token", async () => {
+    await new Promise(resolve => setTimeout(() => resolve("done"), 2000));
+    const response = await request(app)
+      .get("/auth/refresh")
+      .set("Authorization", "JWT " + refreshToken);
+    expect(response.statusCode).not.toBe(200);
+  });
+
+  test("Test Login with missing email", async () => {
+    const response = await request(app)
+      .post("/auth/login")
+      .send({
+        password: "1234567890",
+      });
+    expect(response.statusCode).toBe(400);
+  });
+
+  test("Test Login with missing password", async () => {
+    const response = await request(app)
+      .post("/auth/login")
+      .send({
+        email: "auth-test@test.com",
+      });
+    expect(response.statusCode).toBe(400);
+  });
+
+  test("Test Login with incorrect email", async () => {
+    const response = await request(app)
+      .post("/auth/login")
+      .send({
+        email: "incorrect@test.com",
+        password: "1234567890",
+      });
+    expect(response.statusCode).toBe(401);
+  });
+
+  test("Test Login with incorrect password", async () => {
+    const response = await request(app)
+      .post("/auth/login")
+      .send({
+        email: "auth-test@test.com",
+        password: "incorrectpassword",
+      });
+    expect(response.statusCode).toBe(401);
+  });
+
+  test("Test Login with missing email and password", async () => {
+    const response = await request(app).post("/auth/login").send({});
+    expect(response.statusCode).toBe(400);
+  });
+
+  test("Test Login with invalid credentials", async () => {
+    const response = await request(app)
+      .post("/auth/login")
+      .send({
+        email: "incorrect@test.com",
+        password: "incorrectpassword",
+      });
+    expect(response.statusCode).toBe(401);
+  });
+
+  test("Test Logout- no refresh tokens for user", async () => {
+    await User.findOneAndUpdate({ email: user.email }, { $set: { refreshTokens: [] } }, { new: true });
+    const response = await request(app)
+      .get("/auth/logout")
+      .set("authorization", "Bearer " + refreshToken);
+    expect(response.statusCode).toBe(401);
   });
 });

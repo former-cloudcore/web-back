@@ -4,7 +4,7 @@ import http from 'http';
 import fs from 'fs';
 import swaggerUI from "swagger-ui-express"
 import swaggerJsDoc from "swagger-jsdoc"
-import initSocket from "./tests/socket.io";
+import initSocket from "./web-socket/socket.io";
 
 initApp().then((app) => {
     const options = {

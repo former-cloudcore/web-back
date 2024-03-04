@@ -1,6 +1,7 @@
 import express from "express";
 const router = express.Router();
 import authController from "../controllers/auth";
+import { googleSignIn } from "../controllers/google";
 // import passport from "../passport";
 /**
 * @swagger
@@ -198,7 +199,7 @@ router.post("/login", authController.login);
 *     tags: [Auth]
 *     description: Logout a user
 *     security:
-*       - bearerAuth: []
+*       - refreshAuth: []
 *     responses:
 *       200:
 *         description: Logout completed successfully
@@ -213,7 +214,7 @@ router.get("/logout", authController.logout);
 *   get:
 *     summary: get a new access token using the refresh token
 *     tags: [Auth]
-*     description: Tefresh token has to be provided in the auth header
+*     description: Refresh token has to be provided in the auth header
 *     security:
 *       - refreshAuth: []
 *     responses:
@@ -251,7 +252,7 @@ router.get("/refresh", authController.refresh);
 *         content:
 *         application/json:
 */
-router.post("/google", authController.googleSignIn);
+router.post("/google", googleSignIn);
 
 
 export default router;
