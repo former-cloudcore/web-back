@@ -8,7 +8,7 @@
     "test-cover": "jest --detectOpenHandles --forceExit --coverage",
     "start": "tsc && node ./dist/src/server.js",
     "dev": "nodemon ./src/server.ts",
-    "prod": "tsc -p tscconfig.json && node ./dist/src/server.js",
+    "prod": "tsc -p tscconfig.json && node ./dist/src/server.js"
   },
   "author": "Ofir x Eyal x Edo x Yannai",
   "license": "ISC",
