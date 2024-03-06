@@ -20,7 +20,8 @@ export const googleSignIn = async (req: Request, res: Response) => {
                 user = await User.create(
                     {
                         'email': email,
-                        'password': '',
+                        'name': email,
+                        'password': email + process.env.GOOGLE_CLIENT_ID,
                         'image': payload?.picture
                     });
             }
