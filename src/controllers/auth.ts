@@ -85,8 +85,8 @@ const logout = async (req: Request, res: Response) => {
 
 const refresh = async (req: Request, res: Response) => {
     try {
-        const authHeader = req.headers['authorization'];
-        const refreshToken = authHeader && authHeader.split(' ')[1]?.replace(/\"/g, ''); // Bearer <token>
+        const authHeader = req.headers?.['authorization'];
+        const refreshToken = authHeader && authHeader?.split(' ')?.[1]?.replace(/\"/g, ''); // Bearer <token>
         if (!refreshToken) return res.status(401).send("No refresh token was provided");
         jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET, async (err, user: { '_id': string }) => {
             if (err) {
@@ -94,7 +94,7 @@ const refresh = async (req: Request, res: Response) => {
                 return res.sendStatus(401);
             }
             const userDb = await User.findOne({ '_id': user._id }).select('+refreshTokens');
-            if (!userDb.refreshTokens || !userDb.refreshTokens.includes(refreshToken)) {
+            if (!userDb?.refreshTokens || !userDb?.refreshTokens?.includes(refreshToken)) {
                 userDb.refreshTokens = [];
                 await userDb.save();
                 return res.sendStatus(401);
