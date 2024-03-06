@@ -7,8 +7,9 @@
     "test": "tsc && jest --detectOpenHandles --forceExit",
     "test-cover": "jest --detectOpenHandles --forceExit --coverage",
     "start": "tsc && node ./dist/src/server.js",
-    "dev": "nodemon ./src/server.ts",
-    "prod": "set NODE_ENV=prod&& tsc -p tsconfig.json && node ./dist/src/server.js",
+    "dev": "set NODE_ENV=dev&& nodemon ./src/server.ts",
+    "prod": "export NODE_ENV=prod && tsc -p tsconfig.json && node ./dist/src/server.js",
+    "prod-pm2": "export NODE_ENV=prod && tsc -p tsconfig.json && pm2 start ./dist/src/server.js",
     "prod1": "cp .envprod .env && tsc -p tsconfig_prod.json && node ./dist/src/server.js"
   },
   "author": "Ofir x Eyal x Edo x Yannai",
