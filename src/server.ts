@@ -23,11 +23,11 @@ initApp().then((app) => {
     app.use("/api-docs", swaggerUI.serve, swaggerUI.setup(specs));
 
     let server;
-
     if (process.env.NODE_ENV !== 'prod') {
         console.log('development');
         server = http.createServer(app).listen(process.env.PORT);
     } else {
+        console.log("production")
         const options2 = {
             key: fs.readFileSync('../client-key.pem'),
             cert: fs.readFileSync('../client-cert.pem')
