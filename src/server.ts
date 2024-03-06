@@ -24,7 +24,7 @@ initApp().then((app) => {
 
     let server;
 
-    if (process.env.NODE_ENV !== 'production') {
+    if (process.env.NODE_ENV !== 'prod') {
         console.log('development');
         server = http.createServer(app).listen(process.env.PORT);
     } else {
