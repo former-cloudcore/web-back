@@ -17,7 +17,7 @@ initApp().then((app) => {
             },
             servers: [{url: "http://localhost:3000",},
             {url: "https://node26.cs.colman.ac.il:4000"},
-            {url: "https:/10.10.248.186:4000"},
+            {url: "https://10.10.248.186:4000"},
             {url: "https://193.106.55.186:4000"}],
         },
         apis: ["./src/routes/*.ts"],
