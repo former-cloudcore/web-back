@@ -38,7 +38,7 @@ class PostController extends BaseController<IPost>{
     }
 
     async getById(req: AuthRequest, res: Response) {
-        super.getByIdPopulated(req, res, 'createdBy', 'name image');
+        super.getByIdPopulated(req, res, 'createdBy comments.user', 'name image');
     }
 
     async getByUserId(req: AuthRequest, res: Response) {
