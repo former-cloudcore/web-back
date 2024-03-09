@@ -124,6 +124,22 @@ router.get("/", userController.get.bind(userController));
 *     tags: [User]
 *     security:
 *       - bearerAuth: []
+*     requestBody:
+*       required: true
+*       content:
+*         application/json:
+*           schema:
+*             type: object
+*             properties:
+*               email:
+*                 type: string
+*                 description: The user's email
+*               name:
+*                 type: string
+*                 description: The user's name
+*               password:
+*                 type: string
+*                 description: The user's password
 *     responses:
 *       200:
 *         description: the modified user
