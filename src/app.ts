@@ -12,6 +12,7 @@ import userRouter from "./routes/user";
 import chatRouter from "./routes/chat";
 import authRouter from "./routes/auth";
 import fileRouter from "./routes/file";
+import cors from "cors";
 
 
 const initApp = (): Promise<Express> => {
@@ -23,6 +24,7 @@ const initApp = (): Promise<Express> => {
     const schema = process.env.DB_SCHEMA;
     mongoose.connect(url!, { dbName: schema }).then(() => {
       const app = express();
+      app.use(cors());
       app.use(bodyParser.json());
       app.use(bodyParser.urlencoded({ extended: true }));
       app.use((req, res, next) => {
