@@ -161,7 +161,7 @@ describe("Add a comment to post tests", () => {
         expect(response.statusCode).toBe(200);
         expect(response.body.comments).toHaveLength(1);
         expect(response.body.comments[0].text).toEqual(comment1.text);
-        expect(response.body.comments[0].user).toEqual(user._id);
+        expect(response.body.comments[0].user._id).toEqual(user._id);
 
     });
 });

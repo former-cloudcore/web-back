@@ -106,7 +106,7 @@ const refresh = async (req: Request, res: Response) => {
             await userDb.save();
             return res.status(200).send({
                 'accessToken': accessToken,
-                'refreshToken': refreshToken
+                'refreshToken': newRefreshToken
             });
         });
     } catch (err) {
