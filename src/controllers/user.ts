@@ -2,6 +2,7 @@ import { BaseController } from "./base_controller";
 import { Response } from "express";
 import { AuthRequest } from "../common/auth_middleware";
 import User, { IUser } from "../models/user";
+import bcrypt from 'bcrypt';
 
 class UserController extends BaseController<IUser>{
     constructor() {
@@ -33,6 +34,11 @@ class UserController extends BaseController<IUser>{
 
     async put(req: AuthRequest, res: Response) {
         req.body._id = req.user._id;
+        if (req.body.password) {
+            const salt = await bcrypt.genSalt(10);
+            const encryptedPassword = await bcrypt.hash(req.body.password, salt);
+            req.body.password = encryptedPassword;
+        }
         super.put(req, res);
     }
 }
