@@ -19,11 +19,11 @@ describe("File Tests", () => {
         const filePath = "C:/Users/ofird/Pictures/Screenshots/Screenshot 2024-01-20 121523.png";
 
         const response = await request(app)
-            .post("/file").attach('file', filePath);
+            .post("/api/file").attach('file', filePath);
         expect(response.statusCode).toEqual(200);
         let url = response.body.url;
         url = url.replace(/^.*\/\/[^/]+/, '')
-        const res = await request(app).get(url)
+        const res = await request(app).get(`/api${url}`)
         expect(res.statusCode).toEqual(200);
     });
 });
