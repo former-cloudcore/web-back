@@ -16,6 +16,7 @@ import chatRouter from "./routes/chat";
 import authRouter from "./routes/auth";
 import fileRouter from "./routes/file";
 import cors from "cors";
+import router from "./routes/router";
 
 
 const initApp = (): Promise<Express> => {
@@ -37,12 +38,7 @@ const initApp = (): Promise<Express> => {
         res.header("Access-Control-Allow-Credentials", "true");
         next();
       });
-      app.use("/post", postRouter);
-      app.use("/chat", chatRouter);
-      app.use("/user", userRouter);
-      app.use("/auth", authRouter);
-      app.use("/file", fileRouter);
-      app.use("/public", express.static("public"));
+      app.use("/api", router);
       if (process.env.NODE_ENV === 'prod') {
         app.use(express.static(process.env.CLIENT_PATH));
       }
