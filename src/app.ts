@@ -1,9 +1,12 @@
 import env from "dotenv";
 if (process.env.NODE_ENV === 'test') {
   env.config({ path: '.env.test' });
+} else if (process.env.NODE_ENV === 'prod') {
+  env.config({ path: '.env.prod' });
 } else {
   env.config();
 }
+
 import express, { Express } from "express";
 import mongoose from "mongoose";
 import bodyParser from "body-parser";
@@ -27,19 +30,22 @@ const initApp = (): Promise<Express> => {
       app.use(cors());
       app.use(bodyParser.json());
       app.use(bodyParser.urlencoded({ extended: true }));
-      // app.use((req, res, next) => {
-      //   res.header("Access-Control-Allow-Origin", "*");
-      //   res.header("Access-Control-Allow-Methods", "*");
-      //   res.header("Access-Control-Allow-Headers", "*");
-      //   res.header("Access-Control-Allow-Credentials", "true");
-      //   next();
-      // });
+      app.use((req, res, next) => {
+        res.header("Access-Control-Allow-Origin", "*");
+        res.header("Access-Control-Allow-Methods", "*");
+        res.header("Access-Control-Allow-Headers", "*");
+        res.header("Access-Control-Allow-Credentials", "true");
+        next();
+      });
       app.use("/post", postRouter);
       app.use("/chat", chatRouter);
       app.use("/user", userRouter);
       app.use("/auth", authRouter);
       app.use("/file", fileRouter);
       app.use("/public", express.static("public"));
+      if (process.env.NODE_ENV === 'prod') {
+        app.use(express.static(process.env.CLIENT_PATH));
+      }
       resolve(app);
     });
   });
