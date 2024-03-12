@@ -1,8 +1,8 @@
 import env from "dotenv";
-if (process.env.NODE_ENV === 'test') {
-  env.config({ path: '.env.test' });
-} else if (process.env.NODE_ENV === 'prod') {
-  env.config({ path: '.env.prod' });
+if (process.env.NODE_ENV === "test") {
+  env.config({ path: ".env.test" });
+} else if (process.env.NODE_ENV === "prod") {
+  env.config({ path: ".env.prod" });
 } else {
   env.config();
 }
@@ -10,14 +10,8 @@ if (process.env.NODE_ENV === 'test') {
 import express, { Express } from "express";
 import mongoose from "mongoose";
 import bodyParser from "body-parser";
-import postRouter from "./routes/post";
-import userRouter from "./routes/user";
-import chatRouter from "./routes/chat";
-import authRouter from "./routes/auth";
-import fileRouter from "./routes/file";
 import cors from "cors";
 import router from "./routes/router";
-
 
 const initApp = (): Promise<Express> => {
   const promise = new Promise<Express>((resolve) => {
@@ -39,8 +33,11 @@ const initApp = (): Promise<Express> => {
         next();
       });
       app.use("/api", router);
-      if (process.env.NODE_ENV === 'prod') {
+      if (process.env.NODE_ENV === "prod") {
         app.use(express.static(process.env.CLIENT_PATH));
+        app.get("*", (req, res) => {
+          res.sendFile(process.env.CLIENT_PATH + "/index.html");
+        });
       }
       resolve(app);
     });
