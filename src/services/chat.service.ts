@@ -12,7 +12,7 @@ export async function handleMessagePosting(text: string, chatId: string, token: 
                 'Content-Length': data.length
             },
             port: process.env.PORT,
-            path: `/chat/messages`,
+            path: `/api/chat/messages`,
             method: 'POST',
         }, (res) => {
             const chunks = [];
