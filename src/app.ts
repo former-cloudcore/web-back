@@ -33,10 +33,12 @@ const initApp = (): Promise<Express> => {
         next();
       });
       app.use("/api", router);
+      if (process.env.NODE_ENV === "prod") {
         app.use(express.static(process.env.CLIENT_PATH));
         app.get("*", (req, res) => {
           res.sendFile(process.env.CLIENT_PATH + "/index.html");
         });
+      }
       resolve(app);
     });
   });
