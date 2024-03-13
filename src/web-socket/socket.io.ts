@@ -6,7 +6,8 @@ const initSocket = (server) => {
         cors: {
             origin: "*",
             methods: ["GET", "POST"]
-        }
+        },
+        rejectUnauthorized: false
     });
     io.on('connection', (socket: socketIo.Socket) => {
         console.log('New client connected!');
