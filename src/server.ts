@@ -32,7 +32,7 @@ initApp().then((app) => {
             key: fs.readFileSync('/home/st111/web-back/client-key.pem'),
             cert: fs.readFileSync('/home/st111/web-back/client-cert.pem')
         };
-        server = https.createServer(options2, app).listen(process.env.HTTPS_PORT);
+        server = https.createServer(options2, app).listen(process.env.PORT);
     }
     initSocket(server);
 });
