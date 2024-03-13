@@ -142,7 +142,6 @@ describe("Auth tests", () => {
     const response = await request(app)
       .get("/api/auth/refresh")
       .set("Authorization", "JWT ");
-    console.log(response.body);
     expect(response.statusCode).toBe(401);
   });
 

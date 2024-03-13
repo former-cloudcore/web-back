@@ -85,36 +85,6 @@ describe("Post post tests", () => {
         expect(response.statusCode).toBe(200);
         expect(response.body).toHaveLength(1);
     });
-
-    // test("should create a post with an image", async () => {
-    //     const imagePrompt = "image prompt";
-    //     const response = await request.post("/post").send({ ...post, image_prompt: imagePrompt });
-    //     console.log(response)
-    //     expect(response.statusCode).toBe(201);
-    //     expect(response.body.text).toEqual(post.text);
-    //     expect(response.body.createdBy).toEqual(user._id);
-    //     expect(response.body.image).toBeDefined();
-    // }, 30000); // 10 seconds timeout
-
-    // test("should create a post with an image", async () => {
-    //     const imagePrompt = "image prompt";
-    //     const response = await request.post("/post").send({ ...post, image_prompt: imagePrompt });
-    //     expect(response.statusCode).toBe(201);
-    //     expect(response.body.text).toEqual(post.text);
-    //     expect(response.body.createdBy).toEqual(user._id);
-    //     expect(response.body.image).toBeDefined();
-    // });
-
-    // test("should handle error when failed to generate image", async () => {
-    //     const imagePrompt = "image prompt";
-    //     jest.spyOn(console, 'error').mockImplementation(() => { });
-    //     global.generateImage = jest.fn().mockRejectedValue(new Error('Failed to generate image'));
-    //     const response = await request.post("/post").send({ ...post, image_prompt: imagePrompt });
-    //     expect(response.statusCode).toBe(400);
-    //     expect(response.text).toBe("failed to generate image");
-
-    //     jest.restoreAllMocks();
-    // });
 });
 
 describe("Post get tests", () => {
@@ -232,5 +202,5 @@ describe("post with image prompt", () => {
         expect(response.body.text).toEqual(postWithPrompt.text);
         expect(response.body.createdBy).toEqual(user._id);
         expect(response.body.image).toBeDefined();
-    }, 30000);
+    }, 100000);
 });

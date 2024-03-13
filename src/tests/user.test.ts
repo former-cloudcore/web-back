@@ -26,7 +26,7 @@ beforeAll(async () => {
     await User.deleteMany({});
     const response = await request(app).post("/api/auth/register").send(user);
     user._id = response.body._id;
-    delete user['password'];
+    delete (user as Partial<IUser>).password;
     authorizedRequest = defaults(supertest(app));
     authorizedRequest.set({ 'Authorization': `Bearer ${response.body.accessToken}` });
 });
@@ -99,5 +99,18 @@ describe("User put tests", () => {
         const response = await request(app).get("/api/user");
         expect(response.statusCode).toBe(200);
         expect(response.body[0].name).toEqual(user.name);
+    });
+    test("Test modify our user- unauthorized", async () => {
+        user.name = "modified_name"
+        const response = await request(app).put("/api/user").send(user);
+        expect(response.statusCode).toBe(401);
+    });
+
+    test("Test modify password- password is saved to db differently", async () => {
+        const password = "1234567890";
+        const response = await authorizedRequest.put("/api/user").send({ ...user, password });
+        expect(response.statusCode).toBe(200);
+        const modifiedUser = await User.findById(user._id).select('+password');
+        expect(modifiedUser?.password).not.toBe(password);
     });
 });
