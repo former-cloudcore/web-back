@@ -42,6 +42,7 @@ export async function handleMessagePosting(text: string, chatId: string, token: 
                 });
             });
         } else {
+            https.globalAgent.options.rejectUnauthorized = false;
             req = https.request({
                 hostname: 'localhost',
                 headers: {
