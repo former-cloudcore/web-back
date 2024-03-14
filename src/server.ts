@@ -20,12 +20,12 @@ initApp().then((app) => {
         apis: ["./src/routes/*.ts"],
     };
     const specs = swaggerJsDoc(options);
-    app.use("/api-docs", swaggerUI.serve, swaggerUI.setup(specs));
 
     let server;
     if (process.env.NODE_ENV !== 'prod') {
         console.log('development');
         server = http.createServer(app).listen(process.env.PORT);
+        app.use("/api-docs", swaggerUI.serve, swaggerUI.setup(specs));
     } else {
         console.log("production")
         const options2 = {

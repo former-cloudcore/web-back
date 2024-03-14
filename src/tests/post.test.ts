@@ -98,7 +98,9 @@ describe("Post get tests", () => {
 
 describe("Put post tests", () => {
     test("Test Put a post", async () => {
-        newPost._id = post._id;
+        if (post._id) {
+            newPost._id = post._id;
+        }
         const response = await request.put(`/api/post`).send(newPost);
         expect(response.statusCode).toBe(200);
         expect(response.body.text).toEqual(newPost.text);
