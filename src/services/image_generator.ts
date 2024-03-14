@@ -24,7 +24,7 @@ export async function generateImage(prompt: string) {
         };
 
         // Wait for image to be ready and keep querying the api
-        for (let i = 0; i < 15; i++) {
+        for (let i = 0; i < 60; i++) {
             response = await axios.request(statusOptions);
             if (response.data.status === "COMPLETED") {
                 const filePath = 'public/' + Date.now() + ".png";
