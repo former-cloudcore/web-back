@@ -31,7 +31,7 @@ beforeAll(async () => {
     accessToken = response.body.accessToken;
     request.set({ 'Authorization': `Bearer ${accessToken}` });
     await Chat.deleteMany();
-});
+}, 10000);
 
 afterAll(async () => {
     await User.deleteMany({ 'email': user.email });
